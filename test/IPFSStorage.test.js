@@ -1,6 +1,6 @@
 import { expect, assert } from 'chai';
 import {
-    getBytes32FromMultiash,
+    getBytes32FromMultihash,
     getMultihashFromContractResponse
 } from '../src/multihash';
 import assertRevert from './helpers/assertRevert';
@@ -21,7 +21,7 @@ contract('IPFSStorage', accounts => {
     ];
 
     async function setIPFSHash(account, hash) {
-        const { digest, hashFunction, size } = getBytes32FromMultiash(hash);
+        const { digest, hashFunction, size } = getBytes32FromMultihash(hash);
         return ipfsStorage.setEntry(digest, hashFunction, size, {
             from: account
         });
