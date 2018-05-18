@@ -8,7 +8,7 @@ contract('Owner', accounts => {
         ownerContract = await Owner.new({ from: accounts[0] });
     });
 
-    it('the deployer of the contract should be the owner', () => {
+    it('the deployer of the contract should be the owner', done => {
         ownerContract
             .getOwner()
             .then(owner => {
