@@ -1,5 +1,4 @@
 import { expect, assert } from 'chai';
-
 import {
     getBytes32FromMultiash,
     getMultihashFromContractResponse
@@ -34,13 +33,13 @@ contract('IPFSStorage', accounts => {
         );
     }
 
-    it('should get IPFS hash after setting', async () => {
+    it('should get an IPFS hash after setting', async () => {
         await setIPFSHash(accounts[0], ipfsHashes[0]);
 
         expect(await getIPFSHash(accounts[0])).to.equal(ipfsHashes[0]);
     });
 
-    it('should fire event when new has is set', async () => {
+    it('should fire event when a new hash has is set', async () => {
         await expectEvent(setIPFSHash(accounts[0], ipfsHashes[0]), 'EntrySet');
     });
 
@@ -67,7 +66,7 @@ contract('IPFSStorage', accounts => {
         await expectEvent(ipfsStorage.clearEntry(), 'EntryDeleted');
     });
 
-    it('should prevent clearing non-exists entry', async () => {
+    it('should prevent clearing a non existing entry', async () => {
         await assertRevert(ipfsStorage.clearEntry());
     });
 });
