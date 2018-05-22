@@ -18,36 +18,37 @@ contract IPFSStorage is Owner {
         uint8 size;
     }
 
-    mapping (address => Multihash) private entries;
+    mapping (uint256 => Multihash) private entries;
 
 
     event EntrySet (
-        address indexed key,
+        uint indexed key,
         bytes32 digest,
         uint8 hashFunction,
         uint8 size
     );
 
     event EntryDeleted (
-        address indexed key
+        uint indexed key
     );
 
 
 
     /**
     * @dev associate a multihash entry with the sender address
+    * @param _key the key to use
     * @param _digest hash digest produced by hashing content using hash function
     * @param _hashFunction hashFunction code for the hash function used
     * @param _size length of the digest
     */
-    function setEntry(bytes32 _digest, uint8 _hashFunction, uint8 _size)
+    function setEntry(uint _key, bytes32 _digest, uint8 _hashFunction, uint8 _size)
     public
     {
         onlyOwner();
         Multihash memory entry = Multihash(_digest, _hashFunction, _size);
-        entries[msg.sender] = entry;
+        entries[_key] = entry;
         emit EntrySet(
-            msg.sender, 
+            _key, 
             _digest, 
             _hashFunction, 
             _size
@@ -56,26 +57,27 @@ contract IPFSStorage is Owner {
 
     /**
     * @dev deassociate any multihash entry with the sender address
+    * @param _key the key to use
     */
-    function clearEntry()
+    function clearEntry(uint _key)
     public
     {
         onlyOwner();
-        require(entries[msg.sender].digest != 0);
-        delete entries[msg.sender];
-        emit EntryDeleted(msg.sender);
+        require(entries[_key].digest != 0);
+        delete entries[_key];
+        emit EntryDeleted(_key);
     }
 
     /**
     * @dev retrieve multihash entry associated with an address
-    * @param _address address used as key
+    * @param _key the key to get from
     */
-    function getEntry(address _address)
+    function getEntry(uint _key)
     public
     view
     returns(bytes32 digest, uint8 hashfunction, uint8 size)
     {
-        Multihash storage entry = entries[_address];
+        Multihash storage entry = entries[_key];
         return (entry.digest, entry.hashFunction, entry.size);
     }
 }

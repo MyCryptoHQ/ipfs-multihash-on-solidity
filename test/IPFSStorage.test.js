@@ -20,32 +20,40 @@ contract('IPFSStorage', accounts => {
         'Qmb4atcgbbN5v4CDJ8nz5QG5L2pgwSTLd3raDrnyhLjnUH'
     ];
 
-    async function setIPFSHash(account, hash) {
+    async function setIPFSHash(key, account, hash) {
         const { digest, hashFunction, size } = getBytes32FromMultihash(hash);
-        return ipfsStorage.setEntry(digest, hashFunction, size, {
+        return ipfsStorage.setEntry(key, digest, hashFunction, size, {
             from: account
         });
     }
 
-    async function getIPFSHash(account) {
+    async function getIPFSHash(key) {
         return getMultihashFromContractResponse(
-            await ipfsStorage.getEntry(account)
+            await ipfsStorage.getEntry(key)
         );
     }
 
     it('should get an IPFS hash after setting', async () => {
-        await setIPFSHash(accounts[0], ipfsHashes[0]);
+        await setIPFSHash(1, accounts[0], ipfsHashes[0]);
 
-        expect(await getIPFSHash(accounts[0])).to.equal(ipfsHashes[0]);
+        expect(await getIPFSHash(1, accounts[0])).to.equal(ipfsHashes[0]);
+    });
+
+    it('should allow to set multiple hashes from the same account', async () => {
+        await setIPFSHash(2, accounts[0], ipfsHashes[1]);
+        expect(await getIPFSHash(2, accounts[0])).to.equal(ipfsHashes[1]);
     });
 
     it('should fire event when a new hash has is set', async () => {
-        await expectEvent(setIPFSHash(accounts[0], ipfsHashes[0]), 'EntrySet');
+        await expectEvent(
+            setIPFSHash(1, accounts[0], ipfsHashes[0]),
+            'EntrySet'
+        );
     });
 
     it('should fail to set a hash for a non owner', async () => {
         try {
-            await setIPFSHash(accounts[1], ipfsHashes[1]);
+            await setIPFSHash(1, accounts[1], ipfsHashes[1]);
         } catch (e) {
             return assert.exists(e);
         }
@@ -53,20 +61,20 @@ contract('IPFSStorage', accounts => {
     });
 
     it('should clear IPFS hash after set', async () => {
-        await setIPFSHash(accounts[0], ipfsHashes[0]);
-        expect(await getIPFSHash(accounts[0])).to.equal(ipfsHashes[0]);
+        await setIPFSHash(1, accounts[0], ipfsHashes[0]);
+        expect(await getIPFSHash(1, accounts[0])).to.equal(ipfsHashes[0]);
 
-        await ipfsStorage.clearEntry();
-        expect(await getIPFSHash(accounts[0])).to.be.a('null');
+        await ipfsStorage.clearEntry(1);
+        expect(await getIPFSHash(1, accounts[0])).to.be.a('null');
     });
 
     it('should fire event when entry is cleared', async () => {
-        await setIPFSHash(accounts[0], ipfsHashes[0]);
+        await setIPFSHash(1, accounts[0], ipfsHashes[0]);
 
-        await expectEvent(ipfsStorage.clearEntry(), 'EntryDeleted');
+        await expectEvent(ipfsStorage.clearEntry(1), 'EntryDeleted');
     });
 
     it('should prevent clearing a non existing entry', async () => {
-        await assertRevert(ipfsStorage.clearEntry());
+        await assertRevert(ipfsStorage.clearEntry(1));
     });
 });
