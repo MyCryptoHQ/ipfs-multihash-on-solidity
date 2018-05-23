@@ -75,7 +75,7 @@ contract IPFSStorage is Owner {
     function getEntry(uint _key)
     public
     view
-    returns(bytes32 digest, uint8 hashfunction, uint8 size)
+    returns(bytes32 digest, uint8 hashFunction, uint8 size)
     {
         Multihash storage entry = entries[_key];
         return (entry.digest, entry.hashFunction, entry.size);

@@ -29,15 +29,15 @@ export function getBytes32FromMultihash(multihash) {
  * @param {Multihash} multihash
  * @returns {(string|null)} base58 encoded multihash string
  */
-function getMultihashFromBytes32(multihash) {
-    const { digest, hashfunction, size } = multihash;
+export function getMultihashFromBytes32(multihash) {
+    const { hashFunction, size } = multihash;
     if (size === 0) {
         return null;
     }
-
+    const digest = Buffer.from(multihash.digest.replace('0x', ''), 'hex');
     // prepend hashFunction and digest size
     const multihashBytes = Buffer.alloc(2 + digest.length);
-    multihashBytes[0] = hashfunction;
+    multihashBytes[0] = hashFunction;
     multihashBytes[1] = size;
     multihashBytes.set(digest, 2);
 
